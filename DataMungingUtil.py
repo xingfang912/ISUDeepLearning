@@ -87,7 +87,7 @@ formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
 
 # If all samples are in the same directory, this function 
 # will create class folders and move samples into them accordingly.
-# It is assumed that the class is specified at the beginning the filename of each sample and separated
+# It is assumed that the class is specified at the beginning of the filename of each sample and separated
 # from the remainder of the filename using one of the following delimiters (' ', '_', '-', '.')
 # Note that this function DOES NOT COPY the files, it just moves them.
 def group_into_class_folders(path, delimiters=[' ', '_', '-', '.']):
@@ -214,22 +214,6 @@ def _img_files(path):
 # get names of subdirectories in path.
 def _subdirectories(path):
     return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
-
-# makes a copy of images and directories.
-# New images are result of local binary pattern with histogram equalization.
-"""
-def filter_lbp(path):
-    _resize(path, mode='lbp')
-
-def _lbp(img):
-    radius = 3
-    no_points = 8 * radius
-    img_ = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_ = local_binary_pattern(img_, no_points, radius, method='uniform')
-    img_ = cv2.equalizeHist(img_.astype(np.uint8))
-    img_ = cv2.cvtColor(img_, cv2.COLOR_GRAY2BGR)
-    return img_
-"""
 
 # Performs resize operation with padding, see documentation for '_resize'
 def resize_pad(path, target_width=224):
@@ -430,7 +414,7 @@ def format_4_caffe(path, target_width=224, target_colorspace=None, crop=False):
     print 'created: lmdb'
 
 
-# =============== DEPRECATED METHODS ================== TODO
+# ======= vvvv ======== DEPRECATED ======== vvvv ==========
 
 """
 if __name__ == '__main__':
@@ -447,6 +431,22 @@ if __name__ == '__main__':
         format_4_theano(args.width, args.color, n_train=args.n_train, n_val=args.n_val, n_test=args.n_test, crop=args.crop)
     elif args.mode == 'eigen':
         format_4_eigenfaces(args.width)
+"""
+
+# makes a copy of images and directories.
+# New images are result of local binary pattern with histogram equalization.
+"""
+def filter_lbp(path):
+    _resize(path, mode='lbp')
+
+def _lbp(img):
+    radius = 3
+    no_points = 8 * radius
+    img_ = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_ = local_binary_pattern(img_, no_points, radius, method='uniform')
+    img_ = cv2.equalizeHist(img_.astype(np.uint8))
+    img_ = cv2.cvtColor(img_, cv2.COLOR_GRAY2BGR)
+    return img_
 """
 
 def format_4_eigenfaces(target_width=256):
