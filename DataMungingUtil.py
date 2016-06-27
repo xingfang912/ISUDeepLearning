@@ -8,8 +8,8 @@ import cv2
 # from skimage.feature import local_binary_pattern
 import numpy as np
 import os, shutil, argparse, random
-import lmdb
-import caffe
+# import lmdb
+# import caffe
 
 # Does a parallel shuffle of two numpy arrays.
 # Note: Shuffle is not in-place. New arrays are returned.
@@ -370,6 +370,8 @@ def format_img_4_eigenfaces(img, target_width=256): # 128
 
 # requires images to be in class folders 
 def format_4_caffe(path, target_width=224, target_colorspace=None, crop=False):
+    import lmdb
+    import caffe
     assert (os.path.exists(path) and os.path.isdir(path))
     formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
     class_folders = [ name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name)) ]
