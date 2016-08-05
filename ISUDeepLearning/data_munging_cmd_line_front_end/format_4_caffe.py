@@ -1,4 +1,4 @@
-import DataMungingUtil
+from ISUDeepLearning.DataMungingUtil import format_4_caffe
 import argparse
 
 if __name__ == '__main__':
@@ -6,4 +6,4 @@ if __name__ == '__main__':
     parser.add_argument('--width', dest='width', type=int, required=True, help='width of output images.')
     parser.add_argument('--path', dest='path', type=str, required=True, help='root path where image class folders are stored.')
     args = parser.parse_args()
-    DataMungingUtil.format_4_caffe(path=args.path, target_width=args.width)
+    format_4_caffe(path=args.path, target_width=args.width)

@@ -1,4 +1,4 @@
-import DataMungingUtil
+from ISUDeepLearning.DataMungingUtil import resize_crop
 import argparse
 
 if __name__ == '__main__':
@@ -6,4 +6,4 @@ if __name__ == '__main__':
     parser.add_argument('--path', dest='path', type=str, required=True, help='path of root folder.')
     parser.add_argument('--width', dest='width', type=int, required=True, help='width of output images.')
     args = parser.parse_args()
-    DataMungingUtil.resize_crop(args.path, args.width)
+    resize_crop(args.path, args.width)

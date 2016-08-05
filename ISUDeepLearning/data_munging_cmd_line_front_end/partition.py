@@ -1,4 +1,4 @@
-import DataMungingUtil
+from ISUDeepLearning.DataMungingUtil import partition
 import argparse
 
 if __name__ == '__main__':
@@ -8,4 +8,4 @@ if __name__ == '__main__':
     parser.add_argument('--validation', dest='validation', type=int, required=True, help='number of validation samples per class')
     parser.add_argument('--testing', dest='testing', type=int, required=True, help='number of testing samples per class')
     args = parser.parse_args()
-    DataMungingUtil.partition(args.path, args.training, args.validation, args.testing)
+    partition(args.path, args.training, args.validation, args.testing)

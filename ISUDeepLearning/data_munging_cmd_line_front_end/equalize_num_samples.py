@@ -1,4 +1,4 @@
-import DataMungingUtil
+from ISUDeepLearning.DataMungingUtil import equalize_num_samples
 import argparse
 
 # run this after "group_into_class_folders.py" but before "partition.py"
@@ -9,4 +9,4 @@ if __name__ == '__main__':
     parser.add_argument('--path', dest='path', type=str, required=True, help='path of root folder.')
     parser.add_argument('--n', dest='n', type=int, required=True, help='number of samples per class')
     args = parser.parse_args()
-    DataMungingUtil.equalize_num_samples(args.path, args.n)
+    equalize_num_samples(args.path, args.n)
