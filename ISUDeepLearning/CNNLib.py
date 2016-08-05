@@ -21,13 +21,13 @@ from theano.tensor.nnet import conv
 import theano.printing
 from theano.tensor.signal.pool import pool_2d
 
-import DataMungingUtil
+from ISUDeepLearning.DataMungingUtil import load_dataset
 
-from DBN_functions import *
+from ISUDeepLearning.DNN_functions import ReLU, Sigmoid, Tanh, HiddenLayer, dropout_from_layer, DropoutHiddenLayer
 
 
 def load_data(path, random_seed=None):
-    num_classes, (train_set, valid_set, test_set) = DataMungingUtil.load_dataset(path, random_seed=random_seed)
+    num_classes, (train_set, valid_set, test_set) = load_dataset(path, random_seed=random_seed)
 
     def shared_dataset(data_xy, borrow=True):
         """ Function that loads the dataset into shared variables

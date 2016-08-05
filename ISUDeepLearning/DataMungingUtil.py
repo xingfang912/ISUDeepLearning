@@ -8,8 +8,16 @@ import cv2
 # from skimage.feature import local_binary_pattern
 import numpy as np
 import os, shutil, argparse, random
-# import lmdb
-# import caffe
+
+try:
+    import caffe
+except ImportError:
+    print 'Could not import caffe. Some functions will be disabled.'
+
+try:
+    import lmdb
+except ImportError:
+    print 'Could not import lmdb. Some functions will be disabled.'
 
 # Does a parallel shuffle of two numpy arrays.
 # Note: Shuffle is not in-place. New arrays are returned.
@@ -350,6 +358,11 @@ def format_img_4_theano(img, target_width=224, target_colorspace=None, crop=Fals
         return normalize_img(_resize_pad(img, target_width), flatten)
 
 def format_img_4_caffe(img, target_width=224, target_colorspace=None, crop=False):
+    try:
+        caffe
+    except NameError:
+        print 'Error: format_img_4_caffe(): caffe not defined.'
+        return
     if target_colorspace is not None:
         if target_colorspace == 'gray' and len(img.shape) != 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -370,8 +383,11 @@ def format_img_4_eigenfaces(img, target_width=256): # 128
 
 # requires images to be in class folders 
 def format_4_caffe(path, target_width=224, target_colorspace=None, crop=False):
-    import lmdb
-    import caffe
+    try:
+        caffe
+    except NameError:
+        print 'Error: format_4_caffe(): caffe not defined.'
+        return
     assert (os.path.exists(path) and os.path.isdir(path))
     formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
     class_folders = [ name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name)) ]
