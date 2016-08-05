@@ -31,7 +31,7 @@ import theano
 import theano.tensor as T
 
 
-from logistic_sgd import LogisticRegression
+from ISUDeepLearning.logistic_sgd import LogisticRegression
 
 
 # start-snippet-1
