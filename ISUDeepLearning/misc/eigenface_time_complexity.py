@@ -1,5 +1,5 @@
 import cv2
-import DataMungingUtil
+from ISUDeepLearning.DataMungingUtil import load_dataset
 import time
 import numpy as np
 
@@ -10,7 +10,7 @@ import numpy as np
 path = '/home/ryan/datasets/iPhone5_SamsungGalaxyS4_SamsungGalaxyTab2_resize_pad_224'
 #path = '/home/ryan/datasets/Cropped_Yale_Subset_Periocular_resized_pad_224'
 
-num_classes, ((train_x, train_y), (val_x, val_y), (test_x, test_y)) = DataMungingUtil.load_dataset(path, colorspace='gray', normalize=False)
+num_classes, ((train_x, train_y), (val_x, val_y), (test_x, test_y)) = load_dataset(path, colorspace='gray', normalize=False)
 
 for i in [2, 4, 8, 16, 32, 64, 128, 256]:
     avg = 0.0
