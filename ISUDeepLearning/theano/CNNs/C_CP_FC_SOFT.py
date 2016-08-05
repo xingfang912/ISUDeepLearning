@@ -19,12 +19,9 @@ from theano.tensor.nnet import conv
 import theano.printing
 from theano.tensor.signal.pool import pool_2d
 
-from logistic_sgd import LogisticRegression
-
-from DNN_functions import *
-
-from CNNLib import *
-
+from ISUDeepLearning.logistic_sgd import LogisticRegression
+from ISUDeepLearning.DNN_functions import ReLU, Sigmoid, Tanh, HiddenLayer, dropout_from_layer, DropoutHiddenLayer
+from CNNLib import CPLayer, load_data, test_net
 
 class CNN(object):
 
