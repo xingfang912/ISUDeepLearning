@@ -103,16 +103,29 @@ def group_into_class_folders(path, delimiters=[' ', '_', '-', '.']):
     files = _img_files(path)
     class_folders = {}
     for f in files:
-        f_ = f.replace('_', ' ').replace('-', ' ').replace('.', ' ')
+        f_ = f
+        for delimiter in delimiters:
+            f_ = f_.replace(delimiter, ' ')
         f_ = f_.split(' ')[0]
-        if f_ in class_folders:
-            class_folders[f_].append(f)
-        else:
-            class_folders[f_] = [f]
+        if not f_ == '':
+            if f_ in class_folders:
+                class_folders[f_].append(f)
+            else:
+                class_folders[f_] = [f]
     for k in class_folders:
         os.mkdir(path+'/'+k)
         for f in class_folders[k]:
             shutil.move(path+'/'+f, path+'/'+k+'/'+f)
+
+def ungroup(path):
+    assert (os.path.exists(path) and os.path.isdir(path))
+    dirs = _subdirectories(path)
+    for d in dirs:
+        d_ = os.path.join(path, d)
+        files = _img_files(d_)
+        for f in files:
+            shutil.move(d_+'/'+f, path+'/'+f)
+        shutil.rmtree(d_)
 
 # Forces all classes to have "n" samples.
 # If a given class has fewer than "n" samples, then it's class directory is deleted.
