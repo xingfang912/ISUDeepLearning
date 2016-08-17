@@ -38,12 +38,8 @@ def load_data(path, random_seed=None):
         variable) would lead to a large decrease in performance.
         """
         data_x, data_y = data_xy
-        shared_x = theano.shared(np.asarray(data_x,
-                                               dtype=theano.config.floatX),
-                                 borrow=borrow)
-        shared_y = theano.shared(np.asarray(data_y,
-                                               dtype=theano.config.floatX),
-                                 borrow=borrow)
+        shared_x = theano.shared(np.asarray(data_x, dtype=theano.config.floatX), borrow=borrow)
+        shared_y = theano.shared(np.asarray(data_y, dtype=theano.config.floatX), borrow=borrow)
         # When storing data on the GPU it has to be stored as floats
         # therefore we will store the labels as ``floatX`` as well
         # (``shared_y`` does exactly that). But during our computations
@@ -160,6 +156,13 @@ class CPLayer(object):
         self.input = input
 
 
+# Stuff to add: 
+# N best list with confidence scores. (So we can get Rank-1 Rank-2, etc.)
+# Log the training error, validation error, and store in external file.
+# Log weight change map over time.
+# List of most often misclassified samples. For each sample, how hard was it to learn?
+# Feature that detects overfitting and automatically terminates training,
+#   or in the future adjusts the learning rate.
 def test_net(
         classifier,
         num_classes,
@@ -344,10 +347,9 @@ def test_net(
 
 #    results_file = open(results_file_name, 'wb')
 
-    if plot:
-        plot_training = []
-        plot_valid = []
-        plot_test = []
+    plot_training = []
+    plot_valid = []
+    plot_test = []
 
     while epoch_counter < n_epochs:
         # Train this epoch
@@ -356,15 +358,13 @@ def test_net(
         for minibatch_index in xrange(n_train_batches):
             minibatch_avg_cost += train_model(epoch_counter, minibatch_index)
         
-        if plot:
-            plot_training.append(minibatch_avg_cost/n_train_batches)
+        plot_training.append(minibatch_avg_cost/n_train_batches)
 
         # Compute loss on validation set
         validation_losses = [validate_model(i) for i in xrange(n_valid_batches)]
         this_validation_errors = np.mean(validation_losses)
         
-        if plot:
-            plot_valid.append(this_validation_errors)
+        plot_valid.append(this_validation_errors)
 
         # Report and save progress.
         print "epoch {}, validation error {}%, learning_rate={}{}".format(
@@ -374,8 +374,7 @@ def test_net(
         if this_validation_errors < best_validation_errors:
             best_iter_valid = epoch_counter
 
-        best_validation_errors = min(best_validation_errors,
-                this_validation_errors)
+        best_validation_errors = min(best_validation_errors, this_validation_errors)
 #        results_file.write("{0}\n".format(this_validation_errors))
 #        results_file.flush()
                 
@@ -386,8 +385,7 @@ def test_net(
         ]
         test_score = np.mean(test_losses)
         
-        if plot:
-            plot_test.append(test_score)
+        plot_test.append(test_score)
         
         print(('     epoch %i, test error of '
                'best model %f %%') %
@@ -430,3 +428,5 @@ def test_net(
         plt.grid(axis="y")
         plt.xlabel('Iteration',fontsize=18)
         plt.ylabel('Testing Error',fontsize=14)
+
+    return (plot_training, plot_valid, plot_test)

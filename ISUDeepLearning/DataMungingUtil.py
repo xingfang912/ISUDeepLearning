@@ -91,7 +91,7 @@ def load_dataset(path, colorspace='bgr', normalize=True, random_seed=43):
     train_set, valid_set, test_set = ((data_train,lbls_train), (data_val,lbls_val), (data_test,lbls_test))
     return num_classes, (train_set, valid_set, test_set)
 
-formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
+formats = ['jpg','JPG','jpeg','JPEG','png','gif','pgm','tiff','bmp','bad']
 
 # If all samples are in the same directory, this function 
 # will create class folders and move samples into them accordingly.
@@ -276,6 +276,37 @@ def _resize(path, target_width=224, mode='pad'):
                 print 'f2 = ', f2
                 cv2.imwrite(f2, img)
 
+def augment(path, percent_increase=100.0, augmentations=['mirror']):
+    assert (os.path.exists(path) and os.path.isdir(path))
+    assert (type(percent_increase) is float) and (percent_increase > 0.0)
+    up_one = '/'+'/'.join(path.strip('/').split('/')[0:-1])
+    target_path_name = path.strip('/').split('/')[-1]+'_augmented'
+    target_path =  os.path.join(up_one, target_path_name)
+    os.mkdir(target_path)
+    for root, dirs, files in os.walk(path, topdown=True):
+        relpath = os.path.relpath(root, path)
+        newpath = up_one+'/'+target_path_name+'/'+relpath
+        print newpath
+        for name in dirs:
+            os.mkdir(os.path.join(newpath, name))
+        for name in files:
+            f = os.path.join(root, name)
+            img_orig = cv2.imread(f)
+            if img_orig is not None:
+                img = None
+                if 'mirror' in augmentations:
+                    img = cv2.flip(img_orig, flipCode=1)
+                elif 'equalize_hist' in augmentations:
+                    y, cr, cb = cv2.split(cv2.cvtColor(img_orig, cv2.COLOR_BGR2YCR_CB))
+                    y = cv2.equalizeHist(y)
+                    img = cv2.cvtColor(cv2.merge((y, cr, cb)), cv2.COLOR_YCR_CB2BGR)
+                elif 'gaussian_blur' in augmentations:
+                    img = cv2.GaussianBlur(img_orig,(15,15),0) # TODO Not sure how much to blur.
+                f2 = os.path.join(newpath, '.'.join(name.split('.')[0:-1])+".jpg")
+                f2_aug = os.path.join(newpath, '.'.join(name.split('.')[0:-1])+"_"+augmentations[0]+".jpg")
+                cv2.imwrite(f2, img_orig)
+                cv2.imwrite(f2_aug, img)
+
 # Resizes a numpy.uint8 'img' to a square of 'target_width'. Makes it square via padding.
 def _resize_pad(img, target_width=224):
     """
@@ -402,7 +433,7 @@ def format_4_caffe(path, target_width=224, target_colorspace=None, crop=False):
         print 'Error: format_4_caffe(): caffe not defined.'
         return
     assert (os.path.exists(path) and os.path.isdir(path))
-    formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
+    formats = ['jpg','JPG','jpeg','JPEG','png','gif','pgm','tiff','bmp','bad']
     class_folders = [ name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name)) ]
     # --------- Determine how many samples there are of each class -------------------
     num_class_instances = -1
@@ -495,7 +526,7 @@ def format_4_eigenfaces(target_width=256):
     :type target_width: int
     :param target_width: the height/width of your networks input layer.
     """
-    formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
+    formats = ['jpg','JPG','jpeg','JPEG','png','gif','pgm','tiff','bmp','bad']
     class_folders = [ name for name in os.listdir('./') if os.path.isdir(os.path.join('./', name)) ]
     num_class_instances = -1
     for folder in class_folders:
@@ -556,7 +587,7 @@ def format_4_theano(target_width=224, target_colorspace=None, n_train=-1, n_val=
     :type flatten: bool
     :param flatten: flatten the data instances, otherwise leave them as multi-dimensional arrays.
     """
-    formats = ['jpg','JPEG','png','gif','pgm','tiff','bmp','bad']
+    formats = ['jpg','JPG','jpeg','JPEG','png','gif','pgm','tiff','bmp','bad']
     class_folders = [ name for name in os.listdir('./') if os.path.isdir(os.path.join('./', name)) ]
     num_class_instances = -1
     for folder in class_folders:
