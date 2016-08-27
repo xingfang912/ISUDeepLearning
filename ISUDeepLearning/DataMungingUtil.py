@@ -48,6 +48,8 @@ def read_img(path, colorspace='bgr', normalize=True):
     elif colorspace == 'bgr' and len(img.shape) == 2:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     if normalize:
+        if len(img.shape) == 2:
+            img = np.reshape(img, (img.shape[0], img.shape[1], 1))
         img = img.astype(dtype=np.float32)/256.0
     return img
 
@@ -56,7 +58,7 @@ def read_img(path, colorspace='bgr', normalize=True):
 # if 'normalize' is True, then returns as float32 array with (0->255) mapped to (0->1.0) 
 #    otherwise its the standard numpy.uint8 format used by opencv.
 # 'random_seed' is used to shuffle the data after it's read in, so that order in folders doesn't matter.
-def load_dataset(path, colorspace='bgr', normalize=True, random_seed=43):
+def load_dataset(path, colorspace='bgr', normalize=True, random_seed=43, nk=None, k=None):
     path_train = os.path.join(path, 'training')
     path_val = os.path.join(path, 'validation')
     path_test = os.path.join(path, 'testing')
@@ -88,6 +90,26 @@ def load_dataset(path, colorspace='bgr', normalize=True, random_seed=43):
     data_train, lbls_train = shuffle_in_unison(data_train, lbls_train, random_seed)
     data_val, lbls_val = shuffle_in_unison(data_val, lbls_val, random_seed)
     data_test, lbls_test = shuffle_in_unison(data_test, lbls_test, random_seed)
+    if nk is not None and k is not None: # override the default sets.
+        n_samples = len(data_train)+len(data_val)+len(data_test)
+        if n_samples % nk == 0:
+            combined_x = np.concatenate((data_train, data_test))
+            combined_y = np.concatenate((lbls_train, lbls_test))
+            if len(data_val) > 0:
+                combined_x = np.concatenate((combined_x, data_val))
+                combined_y = np.concatenate((combined_y, lbls_val))
+            test_set_size = n_samples/nk
+            start = test_set_size*k
+            end = start + test_set_size
+            new_test_x = combined_x[start:end]
+            new_test_y = combined_y[start:end]
+            new_train_x = np.concatenate((combined_x[0:start], combined_x[end:]))
+            new_train_y = np.concatenate((combined_y[0:start], combined_y[end:]))
+            data_train, lbls_train = new_train_x, new_train_y
+            data_test, lbls_test = new_test_x, new_test_y
+            data_val, lbls_val = np.array([]), np.array([])
+        else:
+            print 'Warning: DataMungingUtil.load_dataset(): n_samples % nk != 0'
     train_set, valid_set, test_set = ((data_train,lbls_train), (data_val,lbls_val), (data_test,lbls_test))
     return num_classes, (train_set, valid_set, test_set)
 
@@ -157,8 +179,9 @@ def partition(path, training, validation, testing, seed=43):
     print 'partitioning...'
     assert (os.path.exists(path) and os.path.isdir(path))
     assert (type(training) is int) and (training > 0)
-    assert (type(validation) is int) and (validation > 0)
+    assert (type(validation) is int) and (validation >= 0)
     assert (type(testing) is int) and (testing >= 0)
+    assert (validation > 0 or testing > 0)
     class_folders = _subdirectories(path)
     if len(class_folders) <= 3 and 'training' in class_folders: # need to unpartition.
         unpartition(path)
@@ -272,7 +295,7 @@ def _resize(path, target_width=224, mode='pad'):
                     img = _resize_crop(cv2.imread(f), target_width)
                 #elif mode == 'lbp':
                 #    img = _lbp(cv2.imread(f))
-                f2 = os.path.join(newpath, '.'.join(name.split('.')[0:-1])+".bmp")
+                f2 = os.path.join(newpath, '.'.join(name.split('.')[0:-1])+".jpg")
                 print 'f2 = ', f2
                 cv2.imwrite(f2, img)
 
